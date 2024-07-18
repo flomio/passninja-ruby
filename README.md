@@ -28,12 +28,12 @@ Use <a href="https://passninja.com/docs">passninja-ruby</a> as a Ruby gem.</h3>
 # Installation
 Install via RubyGems:
 ```sh
-gem install passninja
+gem install passninja-ruby
 ```
 
 Or add to your Gemfile:
 ```ruby
-gem 'passninja'
+gem 'passninja-ruby'
 ```
 
 # Usage
@@ -85,7 +85,7 @@ pass_objects = pass_ninja_client.passes.find('ptk_0x14') # passType aka pass tem
 ```ruby
 detailed_pass_object = pass_ninja_client.passes.get(
   'ptk_0x14', # passType
-  '97694bd7-3493-4b39-b805-20e3e5e4c770' # serialNumber
+  'ce61b0e13da9a7fe7e' # serialNumber
 )
 ```
 
@@ -102,7 +102,7 @@ decrypted_pass_object = pass_ninja_client.passes.decrypt(
 ```ruby
 updated_pass_object = pass_ninja_client.passes.update(
   'ptk_0x14', # passType
-  '97694bd7-3493-4b39-b805-20e3e5e4c770', # serialNumber
+  'ce61b0e13da9a7fe7e', # serialNumber
   { discount: '100%', memberName: 'Ted' } # passData
 )
 ```
@@ -111,7 +111,7 @@ updated_pass_object = pass_ninja_client.passes.update(
 ```ruby
 deleted_pass_serial_number = pass_ninja_client.passes.delete(
   'ptk_0x14', # passType
-  '97694bd7-3493-4b39-b805-20e3e5e4c770' # serialNumber
+  'ce61b0e13da9a7fe7e' # serialNumber
 )
 puts "Pass deleted. Serial_number: #{deleted_pass_serial_number}"
 ```

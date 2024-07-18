@@ -4,7 +4,7 @@ require "webmock/minitest"
 
 class TestPassninja < Minitest::Test
   def setup
-    @client = Passninja::Client.new("account_id", "api_key")
+    @client = PassNinja::Client.new("account_id", "api_key")
   end
 
   def test_pass_templates_find
