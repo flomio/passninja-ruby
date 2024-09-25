@@ -7,6 +7,12 @@ module PassNinja
       @account_id = account_id
       @api_key = api_key
       @host = host
+      url = URI.parse(host)
+      if url.instance_of? URI::HTTPS
+        @use_ssl = true
+      else
+        @use_ssl = false 
+      end
     end
 
     def pass_templates
@@ -14,25 +20,26 @@ module PassNinja
     end
 
     def passes
-      Passes.new(@account_id, @api_key, @host)
+      Passes.new(@account_id, @api_key, @host, @use_ssl)
     end
   end
 
   class PassTemplates
-    def initialize(account_id, api_key, host)
+    def initialize(account_id, api_key, host, use_ssl)
       @account_id = account_id
       @api_key = api_key
       @host = host
+      @use_ssl = use_ssl
     end
 
     def find(pass_template_key)
-      uri = URI("#{host}/v1/pass_templates/#{pass_template_key}")
+      uri = URI("#{@host}/v1/pass_templates/#{pass_template_key}")
       puts uri
       request = Net::HTTP::Get.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
 
-      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
       end
 
@@ -45,23 +52,24 @@ module PassNinja
   end
 
   class Passes
-    def initialize(account_id, api_key, host)
+    def initialize(account_id, api_key, host, use_ssl)
       @account_id = account_id
       @api_key = api_key
       @host = host
+      @use_ssl = use_ssl
     end
 
     def create(pass_type, pass_data)
       required_fields = fetch_required_keys_set(pass_type)
       validate_fields(pass_data, required_fields)
-      uri = URI("#{host}/v1/passes")
+      uri = URI("#{@host}/v1/passes")
       request = Net::HTTP::Post.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
       request.content_type = "application/json"
       request.body = { passType: pass_type, pass: pass_data }.to_json
 
-      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
       end
 
@@ -78,7 +86,7 @@ module PassNinja
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
 
-      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
       end
 
@@ -90,12 +98,12 @@ module PassNinja
     end
 
     def get(pass_type, serial_number)
-      uri = URI("#{host}/v1/passes/#{pass_type}/#{serial_number}")
+      uri = URI("#{@host}/v1/passes/#{pass_type}/#{serial_number}")
       request = Net::HTTP::Get.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
 
-      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
       end
 
@@ -107,14 +115,14 @@ module PassNinja
     end
 
     def decrypt(pass_type, payload)
-      uri = URI("#{host}/v1/passes/decrypt")
+      uri = URI("#{@host}/v1/passes/decrypt")
       request = Net::HTTP::Post.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
       request.content_type = "application/json"
       request.body = { passType: pass_type, payload: payload }.to_json
 
-      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
       end
 
@@ -128,14 +136,14 @@ module PassNinja
     def update(pass_type, serial_number, pass_data)
       required_fields = fetch_required_keys_set(pass_type)
       validate_fields(pass_data, required_fields)
-      uri = URI("#{host}/v1/passes/#{pass_type}/#{serial_number}")
+      uri = URI("#{@host}/v1/passes/#{pass_type}/#{serial_number}")
       request = Net::HTTP::Put.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
       request.content_type = "application/json"
       request.body = { passData: pass_data }.to_json
 
-      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
       end
 
@@ -147,12 +155,12 @@ module PassNinja
     end
 
     def delete(pass_type, serial_number)
-      uri = URI("#{host}/v1/passes/#{pass_type}/#{serial_number}")
+      uri = URI("#{@host}/v1/passes/#{pass_type}/#{serial_number}")
       request = Net::HTTP::Delete.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
 
-      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
       end
 
@@ -162,13 +170,13 @@ module PassNinja
     private
 
     def fetch_required_keys_set(pass_type)
-      uri = URI("#{host}/v1/passtypes/keys/#{pass_type}")
+      uri = URI("#{@host}/v1/passtypes/keys/#{pass_type}")
 
       request = Net::HTTP::Get.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
 
-      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
       end
 
