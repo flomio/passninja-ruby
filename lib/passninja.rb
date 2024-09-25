@@ -81,7 +81,7 @@ module PassNinja
     end
 
     def find(pass_type)
-      uri = URI("#{host}/v1/passes/#{pass_type}")
+      uri = URI("#{@host}/v1/passes/#{pass_type}")
       request = Net::HTTP::Get.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
