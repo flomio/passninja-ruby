@@ -3,28 +3,30 @@ require "json"
 
 module PassNinja
   class Client
-    def initialize(account_id, api_key)
+    def initialize(account_id, api_key, host = 'https://api.passninja.com')
       @account_id = account_id
       @api_key = api_key
+      @host = host
     end
 
     def pass_templates
-      PassTemplates.new(@account_id, @api_key)
+      PassTemplates.new(@account_id, @api_key, @host)
     end
 
     def passes
-      Passes.new(@account_id, @api_key)
+      Passes.new(@account_id, @api_key, @host)
     end
   end
 
   class PassTemplates
-    def initialize(account_id, api_key)
+    def initialize(account_id, api_key, host)
       @account_id = account_id
       @api_key = api_key
+      @host = host
     end
 
     def find(pass_template_key)
-      uri = URI("https://api.passninja.com/v1/pass_templates/#{pass_template_key}")
+      uri = URI("#{host}/v1/pass_templates/#{pass_template_key}")
       puts uri
       request = Net::HTTP::Get.new(uri)
       request["X-API-KEY"] = @api_key
@@ -43,15 +45,16 @@ module PassNinja
   end
 
   class Passes
-    def initialize(account_id, api_key)
+    def initialize(account_id, api_key, host)
       @account_id = account_id
       @api_key = api_key
+      @host = host
     end
 
     def create(pass_type, pass_data)
       required_fields = fetch_required_keys_set(pass_type)
       validate_fields(pass_data, required_fields)
-      uri = URI("https://api.passninja.com/v1/passes")
+      uri = URI("#{host}/v1/passes")
       request = Net::HTTP::Post.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
@@ -70,7 +73,7 @@ module PassNinja
     end
 
     def find(pass_type)
-      uri = URI("https://api.passninja.com/v1/passes/#{pass_type}")
+      uri = URI("#{host}/v1/passes/#{pass_type}")
       request = Net::HTTP::Get.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
@@ -87,7 +90,7 @@ module PassNinja
     end
 
     def get(pass_type, serial_number)
-      uri = URI("https://api.passninja.com/v1/passes/#{pass_type}/#{serial_number}")
+      uri = URI("#{host}/v1/passes/#{pass_type}/#{serial_number}")
       request = Net::HTTP::Get.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
@@ -104,7 +107,7 @@ module PassNinja
     end
 
     def decrypt(pass_type, payload)
-      uri = URI("https://api.passninja.com/v1/passes/decrypt")
+      uri = URI("#{host}/v1/passes/decrypt")
       request = Net::HTTP::Post.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
@@ -125,7 +128,7 @@ module PassNinja
     def update(pass_type, serial_number, pass_data)
       required_fields = fetch_required_keys_set(pass_type)
       validate_fields(pass_data, required_fields)
-      uri = URI("https://api.passninja.com/v1/passes/#{pass_type}/#{serial_number}")
+      uri = URI("#{host}/v1/passes/#{pass_type}/#{serial_number}")
       request = Net::HTTP::Put.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
@@ -144,7 +147,7 @@ module PassNinja
     end
 
     def delete(pass_type, serial_number)
-      uri = URI("https://api.passninja.com/v1/passes/#{pass_type}/#{serial_number}")
+      uri = URI("#{host}/v1/passes/#{pass_type}/#{serial_number}")
       request = Net::HTTP::Delete.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
@@ -159,7 +162,7 @@ module PassNinja
     private
 
     def fetch_required_keys_set(pass_type)
-      uri = URI("https://api.passninja.com/v1/passtypes/keys/#{pass_type}")
+      uri = URI("#{host}/v1/passtypes/keys/#{pass_type}")
 
       request = Net::HTTP::Get.new(uri)
       request["X-API-KEY"] = @api_key
