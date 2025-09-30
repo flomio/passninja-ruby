@@ -141,7 +141,7 @@ module PassNinja
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
       request.content_type = "application/json"
-      request.body = { passData: pass_data }.to_json
+      request.body = { pass: pass_data }.to_json
 
       response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
