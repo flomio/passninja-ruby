@@ -154,6 +154,25 @@ module PassNinja
       end
     end
 
+    def patch(pass_type, serial_number, pass_data)
+      uri = URI("#{@host}/v1/passes/#{pass_type}/#{serial_number}")
+      request = Net::HTTP::Patch.new(uri)
+      request["X-API-KEY"] = @api_key
+      request["X-ACCOUNT-ID"] = @account_id
+      request.content_type = "application/json"
+      request.body = { pass: pass_data }.to_json
+
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
+        http.request(request)
+      end
+
+      begin
+        JSON.parse(response.body)
+      rescue JSON::ParserError
+        { error: "Unable to parse response" }
+      end
+    end
+
     def delete(pass_type, serial_number)
       uri = URI("#{@host}/v1/passes/#{pass_type}/#{serial_number}")
       request = Net::HTTP::Delete.new(uri)
