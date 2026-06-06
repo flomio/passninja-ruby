@@ -20,11 +20,11 @@ class TestPassninja < Minitest::Test
       .to_return(status: 200, body: { required_fields: ["discount", "memberName"] }.to_json, headers: { 'Content-Type' => 'application/json' })
 
     stub_request(:post, "https://api.passninja.com/v1/passes")
-      .to_return(body: { url: "http://example.com", passType: "ptk_0x14", serialNumber: "12345" }.to_json, headers: { 'Content-Type' => 'application/json' })
+      .to_return(body: { url: "http://example.com", passTemplate: "ptk_0x14", serialNumber: "12345" }.to_json, headers: { 'Content-Type' => 'application/json' })
 
     pass = @client.passes.create("ptk_0x14", { discount: "50%", memberName: "John" })
     assert_equal "http://example.com", pass["url"]
-    assert_equal "ptk_0x14", pass["passType"]
+    assert_equal "ptk_0x14", pass["passTemplate"]
     assert_equal "12345", pass["serialNumber"]
   end
 

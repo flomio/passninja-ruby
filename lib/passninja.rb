@@ -67,7 +67,7 @@ module PassNinja
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
       request.content_type = "application/json"
-      request.body = { passType: pass_type, pass: pass_data }.to_json
+      request.body = { passTemplate: pass_type, pass: pass_data }.to_json
 
       response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
@@ -120,7 +120,7 @@ module PassNinja
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
       request.content_type = "application/json"
-      request.body = { passType: pass_type, payload: payload }.to_json
+      request.body = { passTemplate: pass_type, payload: payload }.to_json
 
       response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
