@@ -16,20 +16,20 @@ class TestPassninja < Minitest::Test
   end
 
   def test_passes_create
-    stub_request(:get, "https://api.passninja.com/v1/pass_templates/ptk_0x14/required_fields")
-      .to_return(status: 200, body: { required_fields: ["discount", "memberName"] }.to_json, headers: { 'Content-Type' => 'application/json' })
+    stub_request(:get, "https://api.passninja.com/v1/passtypes/keys/ptk_0x14")
+      .to_return(status: 200, body: { keys: ["discount", "memberName"] }.to_json, headers: { 'Content-Type' => 'application/json' })
 
     stub_request(:post, "https://api.passninja.com/v1/passes")
-      .to_return(body: { url: "http://example.com", passType: "ptk_0x14", serialNumber: "12345" }.to_json, headers: { 'Content-Type' => 'application/json' })
+      .to_return(body: { url: "http://example.com", passTemplate: "ptk_0x14", serialNumber: "12345" }.to_json, headers: { 'Content-Type' => 'application/json' })
 
     pass = @client.passes.create("ptk_0x14", { discount: "50%", memberName: "John" })
     assert_equal "http://example.com", pass["url"]
-    assert_equal "ptk_0x14", pass["passType"]
+    assert_equal "ptk_0x14", pass["passTemplate"]
     assert_equal "12345", pass["serialNumber"]
   end
 
   def test_passes_find
-    stub_request(:get, "https://api.passninja.com/v1/passes?passType=ptk_0x14")
+    stub_request(:get, "https://api.passninja.com/v1/passes/ptk_0x14")
       .to_return(body: [{ serialNumber: "12345" }].to_json, headers: { 'Content-Type' => 'application/json' })
 
     passes = @client.passes.find("ptk_0x14")
@@ -53,8 +53,8 @@ class TestPassninja < Minitest::Test
   end
 
   def test_passes_update
-    stub_request(:get, "https://api.passninja.com/v1/pass_templates/ptk_0x14/required_fields")
-      .to_return(status: 200, body: { required_fields: ["discount", "memberName"] }.to_json, headers: { 'Content-Type' => 'application/json' })
+    stub_request(:get, "https://api.passninja.com/v1/passtypes/keys/ptk_0x14")
+      .to_return(status: 200, body: { keys: ["discount", "memberName"] }.to_json, headers: { 'Content-Type' => 'application/json' })
 
     stub_request(:put, "https://api.passninja.com/v1/passes/ptk_0x14/12345")
       .to_return(body: { serialNumber: "12345" }.to_json, headers: { 'Content-Type' => 'application/json' })

@@ -16,7 +16,7 @@ module PassNinja
     end
 
     def pass_templates
-      PassTemplates.new(@account_id, @api_key, @host)
+      PassTemplates.new(@account_id, @api_key, @host, @use_ssl)
     end
 
     def passes
@@ -67,7 +67,7 @@ module PassNinja
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
       request.content_type = "application/json"
-      request.body = { passType: pass_type, pass: pass_data }.to_json
+      request.body = { passTemplate: pass_type, pass: pass_data }.to_json
 
       response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
@@ -120,7 +120,7 @@ module PassNinja
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
       request.content_type = "application/json"
-      request.body = { passType: pass_type, payload: payload }.to_json
+      request.body = { passTemplate: pass_type, payload: payload }.to_json
 
       response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
         http.request(request)
@@ -138,6 +138,25 @@ module PassNinja
       validate_fields(pass_data, required_fields)
       uri = URI("#{@host}/v1/passes/#{pass_type}/#{serial_number}")
       request = Net::HTTP::Put.new(uri)
+      request["X-API-KEY"] = @api_key
+      request["X-ACCOUNT-ID"] = @account_id
+      request.content_type = "application/json"
+      request.body = { pass: pass_data }.to_json
+
+      response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: @use_ssl) do |http|
+        http.request(request)
+      end
+
+      begin
+        JSON.parse(response.body)
+      rescue JSON::ParserError
+        { error: "Unable to parse response" }
+      end
+    end
+
+    def patch(pass_type, serial_number, pass_data)
+      uri = URI("#{@host}/v1/passes/#{pass_type}/#{serial_number}")
+      request = Net::HTTP::Patch.new(uri)
       request["X-API-KEY"] = @api_key
       request["X-ACCOUNT-ID"] = @account_id
       request.content_type = "application/json"
