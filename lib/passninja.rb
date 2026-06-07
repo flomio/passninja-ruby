@@ -16,7 +16,7 @@ module PassNinja
     end
 
     def pass_templates
-      PassTemplates.new(@account_id, @api_key, @host)
+      PassTemplates.new(@account_id, @api_key, @host, @use_ssl)
     end
 
     def passes
